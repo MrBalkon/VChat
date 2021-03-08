@@ -1,13 +1,14 @@
 version: '3.7'
 
 services:
-  sna-backend:
+  vchat-backend:
     container_name: ${PROJECT_NAME}-backend
     build:
       context: .
       target: ${NODE_ENV}
     links:
-      - "sna-db:database"
+      - "vchat-db:database"
+      - "vchat-redis:redis"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -17,10 +18,11 @@ services:
     env_file:
       - .env
     depends_on:
-      - sna-db
+      - vchat-db
+      - vchat-redis
     tty: true
 
-  sna-db:
+  vchat-db:
     container_name: ${PROJECT_NAME}-postgres
     image: postgres:12
     environment:
@@ -31,3 +33,9 @@ services:
       - 5432
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+
+  vchat-redis:
+    container_name: ${PROJECT_NAME}-redis
+    image: redis:5
+    expose:
+      - 6379
